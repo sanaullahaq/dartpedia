@@ -5,9 +5,9 @@ import 'package:command_runner/command_runner.dart';
 
 const version = '0.0.1';
 
-void main(List<String> arguments) async {
-  var runner = CommandRunner();
-  await runner.run(arguments);
+void main(List<String> arguments) {
+  var commandRunner = CommandRunner()..addCommand(HelpCommand());
+  commandRunner.run(arguments);
   // // print('Hello Dart!');
   // if (arguments.isEmpty || arguments.first == 'help') {
   //   // print('Hello Dart!');
