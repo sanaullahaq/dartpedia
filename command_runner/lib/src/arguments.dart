@@ -62,6 +62,7 @@ abstract class Command extends Argument {
 
   bool get requiresArgument => false;
 
+  /// late tells the compiler: "I promise this variable will be initialized before it's used — trust me."
   late CommandRunner runner;
 
   @override
@@ -106,7 +107,7 @@ abstract class Command extends Argument {
     );
   }
 
-  Future<Object?> run(ArgResults args);
+  FutureOr<Object?> run(ArgResults args);
 
   @override
   String get usage {

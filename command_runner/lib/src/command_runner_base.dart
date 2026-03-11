@@ -13,7 +13,7 @@ class CommandRunner {
   Future<void> run(List<String> input) async {
     final ArgResults results = parse(input);
     if(results.command != null) {
-      Object? output = await results.command!.run(results);
+      Object? output = await results.command!.run(results);           // ! - Null assertion — "I guarantee .command is not null, trust me"
       print(output.toString());
     }
   }
@@ -26,6 +26,7 @@ class CommandRunner {
 
   ArgResults parse(List<String> input) {
     var results = ArgResults();
+    // print(_commands[input.first]);
     results.command = _commands[input.first];
     return results;
   }
