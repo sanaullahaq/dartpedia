@@ -7,7 +7,16 @@ void main(List<String> arguments) {
   /**
    * .. lets you call multiple methods/set multiple properties on the same object, without repeating the variable name. It always returns the original object, not the result of the method call.
    */
-  var commandRunner = CommandRunner()..addCommand(HelpCommand());   // .. Cascade Operator skips the below line.
+  var commandRunner = CommandRunner(
+    onError: (Object error) {
+      if (error is Error) {
+        throw error;
+      }
+      if (error is Exception) {
+        print(error);
+      }
+    },
+  )..addCommand(HelpCommand());   // .. Cascade Operator skips the below line.
   // commandRunner.addCommand(HelpCommand());
   commandRunner.run(arguments);
 }
