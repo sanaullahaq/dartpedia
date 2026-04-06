@@ -7,12 +7,33 @@ import 'exceptions.dart';
 
 class CommandRunner {
   // Add a constructor that accepts the optional callback.
-  CommandRunner({this.onError});
+  CommandRunner({this.onOutput, this.onError});
 
   final Map<String, Command> _commands = <String, Command>{};
 
   UnmodifiableSetView<Command> get commands =>
       UnmodifiableSetView<Command>(<Command>{..._commands.values});
+
+  /// If not null, this method is used to handle output. Useful if you want to
+  /// execute code before the output is printed to the console, or if you
+  /// want to do something other than print output the console.
+  /// If null, the onInput method will [print] the output.
+  FutureOr<void> Function(String)? onOutput;
+
+  // Command finishes running
+  //       │
+  //       │ produces output
+  //       ▼
+  // output.toString()
+  //       │
+  //       │ passed into
+  //       ▼
+  // onOutput!(output)  ← you decide what to do with it
+  //       │
+  //       ├── print to console?
+  //       ├── write to file?
+  //       ├── send over network?
+  //       └── anything you want
 
   FutureOr<void> Function(Object)? onError;
   // ```
@@ -32,14 +53,19 @@ class CommandRunner {
         Object? output = await results.command!.run(
           results,
         ); // ! - Null assertion — "I guarantee .command is not null, trust me"
-        print(output.toString());
+
+        if (onOutput != null) {
+          await onOutput!(output.toString());
+        } else {
+          print(output.toString());
+        }
       }
     } on Exception catch (exception) {
       if (onError != null) {
         onError!(exception);
       } else {
         // throw exception;    // creates a NEW exception — loses original stack trace
-        rethrow;               // re-throws the SAME exception — preserves stack trace
+        rethrow; // re-throws the SAME exception — preserves stack trace
       }
     }
   }
@@ -55,7 +81,7 @@ class CommandRunner {
     if (input.isEmpty) return results;
 
     // Throw an exception if the command is not recognized.
-    if(_commands.containsKey(input.first)){
+    if (_commands.containsKey(input.first)) {
       results.command = _commands[input.first];
       input = input.sublist(1);
     } else {
@@ -67,7 +93,9 @@ class CommandRunner {
     }
 
     // Throw an exception if multiple commands are provided.
-    if (results.command != null && input.isNotEmpty && _commands.containsKey(input.first)) {
+    if (results.command != null &&
+        input.isNotEmpty &&
+        _commands.containsKey(input.first)) {
       throw ArgumentException(
         'Input can only contain one command. Got ${input.first} and ${results.command!.name}',
         null,
@@ -90,7 +118,7 @@ class CommandRunner {
               results.command!.name,
               input[i],
             );
-          }
+          },
         );
 
         if (option.type == OptionType.flag) {
@@ -101,7 +129,7 @@ class CommandRunner {
 
         if (option.type == OptionType.option) {
           // Throw an exception if an option requires an argument but none is given
-          if (i+1 >= input.length) {
+          if (i + 1 >= input.length) {
             throw ArgumentException(
               'Option ${option.name} requires an argument',
               results.command!.name,
@@ -115,7 +143,7 @@ class CommandRunner {
               option.name,
             );
           }
-          var arg = input [i + 1];
+          var arg = input[i + 1];
           inputOptions[option] = arg;
           i++;
         }

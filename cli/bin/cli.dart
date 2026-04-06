@@ -8,6 +8,9 @@ void main(List<String> arguments) {
    * .. lets you call multiple methods/set multiple properties on the same object, without repeating the variable name. It always returns the original object, not the result of the method call.
    */
   var commandRunner = CommandRunner(
+    onOutput: (String output) async {
+      await write(output);
+    },
     onError: (Object error) {
       if (error is Error) {
         throw error;

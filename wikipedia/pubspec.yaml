@@ -1,5 +1,5 @@
-name: command_runner
-description: A starting point for Dart libraries or applications.
+name: wikipedia
+description: A sample command-line application.
 version: 1.0.0
 resolution: workspace
 # repository: https://github.com/my_org/my_repo
