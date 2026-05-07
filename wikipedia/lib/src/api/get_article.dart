@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:http/http.dart' as http;
 
-import '../../model/article.dart';
+import '../model/article.dart';
 
 Future<List<Article>> getArticleByTitle(String title) async {
   final http.Client client = http.Client();
